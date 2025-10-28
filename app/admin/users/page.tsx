@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import Title from '@/components/Title'
 
 export default async function AdminUsers({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
   const supabase = createClient()
@@ -129,10 +130,10 @@ export default async function AdminUsers({ searchParams }: { searchParams?: { [k
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Usuarios</h1>
+      <Title>Usuarios</Title>
 
       {!!status && (
-        <div className="text-sm rounded border border-slate-700 p-2">
+  <div className="text-sm rounded border border-stone-700 p-2">
           {status === 'created' && (
             <div>
               Usuario creado sin verificación de correo.
@@ -152,77 +153,79 @@ export default async function AdminUsers({ searchParams }: { searchParams?: { [k
         </div>
       )}
 
-  <section className="rounded border border-slate-800 p-4">
+  <section className="tavern-panel p-4">
         <h2 className="font-semibold mb-2">Crear nuevo usuario</h2>
         <form action={createUser} className="grid md:grid-cols-2 gap-3">
           <label className="flex flex-col gap-1">
             <span className="text-sm opacity-80">Email</span>
-            <input name="email" type="email" className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+            <input name="email" type="email" className="bg-transparent border border-stone-700 rounded px-2 py-1" />
           </label>
           <label className="flex flex-col gap-1">
             <span className="text-sm opacity-80">Nombre</span>
-            <input name="name" type="text" required className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+            <input name="name" type="text" required className="bg-transparent border border-stone-700 rounded px-2 py-1" />
           </label>
           <label className="flex flex-col gap-1">
             <span className="text-sm opacity-80">Discord ID</span>
-            <input name="discord_id" type="text" className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+            <input name="discord_id" type="text" className="bg-transparent border border-stone-700 rounded px-2 py-1" />
           </label>
           <label className="flex flex-col gap-1">
             <span className="text-sm opacity-80">Límite de personajes</span>
-            <input name="character_limit" type="number" min={0} defaultValue={4} required className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+            <input name="character_limit" type="number" min={0} defaultValue={4} required className="bg-transparent border border-stone-700 rounded px-2 py-1" />
           </label>
           <label className="mt-1 flex items-center gap-2">
-            <input name="is_admin" type="checkbox" className="accent-slate-200" />
+            <input name="is_admin" type="checkbox" className="accent-stone-200" />
             <span className="text-sm">Es administrador</span>
           </label>
           <div className="md:col-span-2">
-            <button className="border border-slate-700 rounded px-3 py-1">Crear usuario</button>
+            <button className="border border-stone-700 rounded px-3 py-1">Crear usuario</button>
           </div>
         </form>
         <p className="text-xs opacity-70 mt-2">Nombre y Límite son obligatorios. Email y Discord ID son opcionales. Si no indicas email, se generará un email sintético y una contraseña temporal para poder iniciar sesión y luego podrás editar su perfil aquí.</p>
       </section>
+      <div className="tavern-panel p-3">
       <table className="w-full text-sm">
         <thead className="text-left opacity-70"><tr>
           <th>Email</th><th>Nombre</th><th>Discord</th><th>Límite</th><th>Admin</th><th>Creado</th>
         </tr></thead>
         <tbody>
           {(users as ProfileRow[] | null ?? []).map((u) => (
-            <tr key={u.id} className="border-t border-slate-800 align-top">
+            <tr key={u.id} className="border-t border-stone-800/70 align-top">
               <td colSpan={5}>
                 <form action={updateUser} className="grid md:grid-cols-6 gap-3 py-2">
                   <input type="hidden" name="id" value={u.id} />
                   <label className="flex flex-col gap-1">
                     <span className="text-xs opacity-70">Email</span>
-                    <input name="email" defaultValue={emailById.get(u.id) ?? ''} className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+                    <input name="email" defaultValue={emailById.get(u.id) ?? ''} className="bg-transparent border border-stone-700 rounded px-2 py-1" />
                   </label>
                   <label className="flex flex-col gap-1">
                     <span className="text-xs opacity-70">Nombre</span>
-                    <input name="name" defaultValue={u.name ?? ''} className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+                    <input name="name" defaultValue={u.name ?? ''} className="bg-transparent border border-stone-700 rounded px-2 py-1" />
                   </label>
                   <label className="flex flex-col gap-1">
                     <span className="text-xs opacity-70">Discord ID</span>
-                    <input name="discord_id" defaultValue={u.discord_id ?? ''} className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+                    <input name="discord_id" defaultValue={u.discord_id ?? ''} className="bg-transparent border border-stone-700 rounded px-2 py-1" />
                   </label>
                   <label className="flex flex-col gap-1">
                     <span className="text-xs opacity-70">Límite</span>
-                    <input name="character_limit" type="number" min={0} defaultValue={u.character_limit} className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+                    <input name="character_limit" type="number" min={0} defaultValue={u.character_limit} className="bg-transparent border border-stone-700 rounded px-2 py-1" />
                   </label>
                   <label className="flex items-center gap-2 mt-6">
-                    <input name="is_admin" type="checkbox" defaultChecked={u.is_admin} className="accent-slate-200" />
+                    <input name="is_admin" type="checkbox" defaultChecked={u.is_admin} className="accent-stone-200" />
                     <span className="text-xs">Admin</span>
                   </label>
                   <label className="flex flex-col gap-1">
                     <span className="text-xs opacity-70">Nueva contraseña</span>
-                    <input name="new_password" type="password" placeholder="(opcional)" className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+                    <input name="new_password" type="password" placeholder="(opcional)" className="bg-transparent border border-stone-700 rounded px-2 py-1" />
                   </label>
-                  <div className="flex items-end"><button className="border border-slate-700 rounded px-3 py-1">Guardar</button></div>
+                  <div className="flex items-end"><button className="border border-stone-700 rounded px-3 py-1">Guardar</button></div>
                 </form>
                 <div className="text-xs opacity-60">Creado: {new Date(u.created_at).toLocaleString('es-AR')}</div>
               </td>
             </tr>
           ))}
         </tbody>
-      </table>
+  </table>
+  </div>
       <p className="opacity-70">Podés actualizar email, nombre, Discord, límite y rol.</p>
     </div>
   )

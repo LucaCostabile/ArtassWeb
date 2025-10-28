@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import Title from '@/components/Title'
 
 export default async function AdminCharacters({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
   const supabase = createClient()
@@ -202,12 +203,12 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Personajes</h1>
+      <Title>Personajes</Title>
       {/* Filtros */}
       <form method="get" className="grid md:grid-cols-4 gap-3">
         <label className="flex flex-col gap-1">
           <span className="text-sm opacity-80">Usuario</span>
-          <select name="owner" defaultValue={fOwner} className="bg-transparent border border-slate-700 rounded px-2 py-1">
+          <select name="owner" defaultValue={fOwner} className="bg-transparent border border-stone-700 rounded px-2 py-1">
             <option value="">Todos</option>
             {(profileRows as ProfileItem[] | null ?? []).map(p => (
               <option key={p.id} value={p.id}>{p.name ?? p.id}</option>
@@ -216,24 +217,24 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
         </label>
         <label className="flex flex-col gap-1">
           <span className="text-sm opacity-80">Nombre</span>
-          <input name="name" defaultValue={fName} className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+          <input name="name" defaultValue={fName} className="bg-transparent border border-stone-700 rounded px-2 py-1" />
         </label>
         <label className="flex flex-col gap-1">
           <span className="text-sm opacity-80">Nivel</span>
-          <input name="level" type="number" min={1} defaultValue={typeof fLevel === 'number' ? fLevel : ''} className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+          <input name="level" type="number" min={1} defaultValue={typeof fLevel === 'number' ? fLevel : ''} className="bg-transparent border border-stone-700 rounded px-2 py-1" />
         </label>
         <div className="flex items-end">
-          <button className="border border-slate-700 rounded px-3 py-1">Filtrar</button>
+          <button className="border border-stone-700 rounded px-3 py-1">Filtrar</button>
         </div>
       </form>
 
       {/* Crear nuevo personaje */}
-      <section className="rounded border border-slate-800 p-4">
+      <section className="tavern-panel p-4">
         <h2 className="font-semibold mb-2">Crear personaje</h2>
         <form action={createCharacter} className="grid md:grid-cols-3 gap-3">
           <label className="flex flex-col gap-1">
             <span className="text-sm opacity-80">Usuario</span>
-            <select name="owner" required className="bg-transparent border border-slate-700 rounded px-2 py-1">
+            <select name="owner" required className="bg-transparent border border-stone-700 rounded px-2 py-1">
               <option value="">Seleccionar…</option>
               {(profileRows as ProfileItem[] | null ?? []).map(p => (
                 <option key={p.id} value={p.id}>{p.name ?? p.id}</option>
@@ -242,22 +243,22 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
           </label>
           <label className="flex flex-col gap-1">
             <span className="text-sm opacity-80">Nombre</span>
-            <input name="name" required className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+            <input name="name" required className="bg-transparent border border-stone-700 rounded px-2 py-1" />
           </label>
           <label className="flex flex-col gap-1">
             <span className="text-sm opacity-80">Nivel</span>
-            <input name="level" type="number" min={1} defaultValue={1} className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+            <input name="level" type="number" min={1} defaultValue={1} className="bg-transparent border border-stone-700 rounded px-2 py-1" />
           </label>
           <label className="flex flex-col gap-1">
             <span className="text-sm opacity-80">EXP (0-74)</span>
-            <input name="exp" type="number" min={0} max={74} defaultValue={0} className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+            <input name="exp" type="number" min={0} max={74} defaultValue={0} className="bg-transparent border border-stone-700 rounded px-2 py-1" />
           </label>
           <label className="flex flex-col gap-1 md:col-span-2">
             <span className="text-sm opacity-80">Ítems</span>
-            <textarea name="items" placeholder="Listado de ítems" rows={3} className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+            <textarea name="items" placeholder="Listado de ítems" rows={3} className="bg-transparent border border-stone-700 rounded px-2 py-1" />
           </label>
           <div className="md:col-span-3">
-            <button className="border border-slate-700 rounded px-3 py-1">Crear</button>
+            <button className="border border-stone-700 rounded px-3 py-1">Crear</button>
           </div>
         </form>
       </section>
@@ -267,12 +268,12 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
           const pagos = pagosMap.get(c.id) ?? 0
           const boxes = Array.from({ length: 5 }, (_, i) => i < pagos)
           return (
-          <li key={c.id} className="border border-slate-800 rounded p-3">
+          <li key={c.id} className="sheet-card p-3">
             <form action={updateCharacter} className="grid md:grid-cols-6 gap-3">
               <input type="hidden" name="id" value={c.id} />
               <label className="flex flex-col gap-1">
                 <span className="text-xs opacity-70">Usuario</span>
-                <select name="owner" defaultValue={c.owner} className="bg-transparent border border-slate-700 rounded px-2 py-1">
+                <select name="owner" defaultValue={c.owner} className="bg-transparent border border-stone-700 rounded px-2 py-1">
                   {(profileRows as ProfileItem[] | null ?? []).map(p => (
                     <option key={p.id} value={p.id}>{p.name ?? p.id}</option>
                   ))}
@@ -280,38 +281,38 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
               </label>
               <label className="flex flex-col gap-1">
                 <span className="text-xs opacity-70">Nombre</span>
-                <input name="name" defaultValue={c.name} className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+                <input name="name" defaultValue={c.name} className="bg-transparent border border-stone-700 rounded px-2 py-1" />
               </label>
               <label className="flex flex-col gap-1">
                 <span className="text-xs opacity-70">Nivel</span>
-                <input name="level" type="number" min={1} defaultValue={c.level} className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+                <input name="level" type="number" min={1} defaultValue={c.level} className="bg-transparent border border-stone-700 rounded px-2 py-1" />
               </label>
               <label className="flex flex-col gap-1">
                 <span className="text-xs opacity-70">EXP</span>
-                <input name="exp" type="number" min={0} max={74} defaultValue={c.exp} className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+                <input name="exp" type="number" min={0} max={74} defaultValue={c.exp} className="bg-transparent border border-stone-700 rounded px-2 py-1" />
               </label>
               <label className="flex flex-col gap-1 md:col-span-2">
                 <span className="text-xs opacity-70">Ítems</span>
-                <textarea name="items" defaultValue={c.items} rows={3} className="bg-transparent border border-slate-700 rounded px-2 py-1" />
+                <textarea name="items" defaultValue={c.items} rows={3} className="bg-transparent border border-stone-700 rounded px-2 py-1" />
               </label>
               <div className="md:col-span-6 flex items-center gap-3">
-                <button className="border border-slate-700 rounded px-3 py-1">Guardar</button>
+                <button className="border border-stone-700 rounded px-3 py-1">Guardar</button>
               </div>
             </form>
             <div className="flex items-center gap-2 mt-3 justify-end">
               <span className="text-xs opacity-70">Pagos semana:</span>
               <div className="flex gap-1">
                 {boxes.map((filled, i) => (
-                  <div key={i} className={`w-4 h-4 rounded border ${filled ? 'bg-green-500 border-green-500' : 'border-slate-600'}`} />
+                  <div key={i} className={`w-4 h-4 rounded border ${filled ? 'bg-green-600 border-green-600' : 'border-stone-600'}`} />
                 ))}
               </div>
               <form action={decrementPayment}>
                 <input type="hidden" name="id" value={c.id} />
-                <button type="submit" className="border border-slate-700 rounded px-2 py-1 text-sm" title="Reducir pago">−</button>
+                <button type="submit" className="border border-stone-700 rounded px-2 py-1 text-sm" title="Reducir pago">−</button>
               </form>
               <form action={incrementPayment}>
                 <input type="hidden" name="id" value={c.id} />
-                <button type="submit" className="border border-slate-700 rounded px-2 py-1 text-sm" title="Agregar pago">+</button>
+                <button type="submit" className="border border-stone-700 rounded px-2 py-1 text-sm" title="Agregar pago">+</button>
               </form>
             </div>
           </li>

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import Title from '@/components/Title'
 
 export default async function DashboardPage() {
   const supabase = createClient()
@@ -33,30 +34,30 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Mis personajes</h1>
+      <Title>Mis personajes</Title>
       <ul className="grid md:grid-cols-2 gap-4">
         {(characters as MyChar[] | null ?? []).map((c) => {
           const pagos = pagosMap.get(c.id) ?? 0
           const boxes = Array.from({ length: 5 }, (_, i) => i < pagos)
           return (
-            <li key={c.id} className="rounded border border-slate-800 p-4 space-y-3">
-              <div>
-                <div className="font-semibold">{c.name}</div>
-                <div className="text-sm opacity-80">Nivel {c.level} · EXP {c.exp}/74</div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs opacity-70">Pagos semana:</span>
-                <div className="flex gap-1">
-                  {boxes.map((filled, i) => (
-                    <div key={i} className={`w-4 h-4 rounded border ${filled ? 'bg-green-500 border-green-500' : 'border-slate-600'}`} />
-                  ))}
+              <li key={c.id} className="sheet-card p-4 space-y-3">
+                <div className="flex items-baseline justify-between">
+                  <div className="font-semibold text-lg">{c.name}</div>
+                  <div className="text-sm opacity-80">Nivel {c.level} · EXP {c.exp}/74</div>
                 </div>
-              </div>
-              <div>
-                <div className="text-sm opacity-80 mb-1">Objetos</div>
-                <pre className="whitespace-pre-wrap text-sm opacity-90">{c.items || '—'}</pre>
-              </div>
-            </li>
+                <div className="sheet-section p-3 flex items-center gap-3">
+                  <span className="text-xs opacity-70">Pagos semana:</span>
+                  <div className="flex gap-1">
+                    {boxes.map((filled, i) => (
+                      <div key={i} className={`w-4 h-4 rounded border ${filled ? 'bg-green-600 border-green-600' : 'border-stone-600'}`} />
+                    ))}
+                  </div>
+                </div>
+                <div className="sheet-section p-3">
+                  <div className="text-sm opacity-80 mb-1">Objetos</div>
+                  <pre className="whitespace-pre-wrap text-sm opacity-90">{c.items || '—'}</pre>
+                </div>
+              </li>
           )
         })}
         {(!characters || characters.length === 0) && (

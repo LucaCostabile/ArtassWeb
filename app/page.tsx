@@ -1,5 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import Image from 'next/image'
+import banner from '@/assets/Banner.png'
+import Title from '@/components/Title'
 
 export default async function HomePage() {
   const supabase = createClient()
@@ -22,24 +25,16 @@ export default async function HomePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Bienvenido al mundo de Artass</h1>
-        <div className="text-sm opacity-80">
-          {user ? (
-            <form action="/auth/signout" method="post">
-              <button className="underline">Cerrar sesión</button>
-            </form>
-          ) : (
-            <Link className="underline" href="/login">Iniciar sesión</Link>
-          )}
-        </div>
+        <Title>Bienvenido al mundo de Artass</Title>
       </div>
 
-      <p className="opacity-80">
+      {/* Banner primero */}
+      <div className="rounded overflow-hidden border border-stone-800/70">
+        <Image src={banner} alt="Banner Artass" priority className="w-full h-auto object-cover" />
+      </div>
+
+      <p className="opacity-85">
         Este es el portal para gestionar los personajes de rol y la organización del mundo de Artass.
-      </p>
-      <p className="text-sm opacity-70">
-        Pagos: al completar misiones se “marca un pago”. Cada personaje puede registrar hasta 5 pagos por semana.
-        El contador se reinicia cada sábado a las 00:00.
       </p>
 
       {!user && (
@@ -53,7 +48,7 @@ export default async function HomePage() {
           <h2 className="text-xl font-semibold">Noticias</h2>
           <ul className="space-y-3">
             {(news ?? []).map((n) => (
-              <li key={n.id} className="rounded border border-slate-800 p-4">
+              <li key={n.id} className="signboard p-4">
                 <h3 className="text-lg font-semibold">{n.title}</h3>
                 <p className="opacity-90 whitespace-pre-wrap">{n.content}</p>
                 <div className="text-xs opacity-60 mt-2">{new Date(n.created_at).toLocaleString('es-AR')}</div>

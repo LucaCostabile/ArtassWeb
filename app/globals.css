@@ -11,3 +11,68 @@ html, body { height: 100%; }
 body { background: var(--bg); color: var(--fg); }
 
 .container { @apply mx-auto max-w-5xl px-4; }
+
+/* Estilos temáticos: taberna / cartel / hoja DnD */
+.font-english { font-family: 'English Garden SG Regular', ui-serif, Georgia, 'Times New Roman', Times, serif; }
+
+/* Carga opcional de la fuente English Garden SG (debes colocar los archivos en /public/fonts/) */
+@font-face {
+  font-family: 'English Garden SG Regular';
+  src: url('/fonts/EnglishGardenSG-Regular.woff2') format('woff2'),
+       url('/fonts/EnglishGardenSG-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+.tavern-panel {
+  position: relative;
+  border: 1px solid rgba(120,53,15,0.6); /* amber-900 */
+  background: linear-gradient(180deg, rgba(41,37,36,0.6), rgba(28,25,23,0.6)); /* stone */
+  border-radius: 12px;
+  box-shadow: 0 2px 0 rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+.tavern-panel::before,
+.tavern-panel::after {
+  content: "";
+  position: absolute;
+  left: 14px; right: 14px;
+  height: 6px;
+  background: linear-gradient(180deg, #9a3412, #7c2d12);
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+.tavern-panel::before { top: 10px; }
+.tavern-panel::after { bottom: 10px; }
+
+.signboard {
+  position: relative;
+  border: 1px solid rgba(217,119,6,0.6); /* amber-600 */
+  background: linear-gradient(180deg, rgba(120,53,15,0.35), rgba(68,32,22,0.35));
+  border-radius: 10px;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.5);
+}
+.signboard::before,
+.signboard::after {
+  content: "";
+  position: absolute;
+  top: -6px;
+  width: 10px; height: 10px;
+  background: radial-gradient(circle at 30% 30%, #f59e0b, #92400e);
+  border-radius: 50%;
+  box-shadow: 0 2px 0 rgba(0,0,0,0.4);
+}
+.signboard::before { left: 24px; }
+.signboard::after { right: 24px; }
+
+.sheet-card {
+  position: relative;
+  border: 1px solid rgba(148,163,184,0.35); /* slate-400 */
+  background: linear-gradient(180deg, rgba(15,23,42,0.35), rgba(2,6,23,0.35));
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03), 0 1px 0 rgba(0,0,0,0.6);
+}
+.sheet-section {
+  border: 1px solid rgba(100,116,139,0.3); /* slate-500 */
+  background: rgba(2,6,23,0.35);
+  border-radius: 8px;
+}

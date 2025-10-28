@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import Title from '@/components/Title'
 
 export default async function AdminIndex() {
   const supabase = createClient()
@@ -16,13 +17,22 @@ export default async function AdminIndex() {
   if (!me?.is_admin) redirect('/dashboard')
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Panel de administración</h1>
-      <ul className="list-disc pl-6 space-y-2">
-        <li><Link className="underline" href="/admin/users">Gestionar usuarios</Link></li>
-        <li><Link className="underline" href="/admin/characters">Gestionar personajes</Link></li>
-        <li><Link className="underline" href="/admin/news">Gestionar noticias</Link></li>
-      </ul>
+    <div className="space-y-6">
+      <Title>Panel de administración</Title>
+      <div className="grid sm:grid-cols-2 gap-4">
+        <Link href="/admin/users" className="tavern-panel p-5 hover:brightness-110 transition block">
+          <div className="text-2xl font-semibold">Usuarios</div>
+          <div className="opacity-80">Crear, editar y asignar contraseñas.</div>
+        </Link>
+        <Link href="/admin/characters" className="tavern-panel p-5 hover:brightness-110 transition block">
+          <div className="text-2xl font-semibold">Personajes</div>
+          <div className="opacity-80">Listado, filtros, pagos semanales, ítems.</div>
+        </Link>
+        <Link href="/admin/news" className="tavern-panel p-5 hover:brightness-110 transition block sm:col-span-2">
+          <div className="text-2xl font-semibold">Noticias</div>
+          <div className="opacity-80">Crear y mantener anuncios del servidor.</div>
+        </Link>
+      </div>
     </div>
   )
 }

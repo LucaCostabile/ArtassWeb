@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import Title from '@/components/Title'
 
 function PagoBoxes({ count }: { count: number }) {
   return (
@@ -52,7 +53,7 @@ export default async function AdminCharacterDetail({ params }: { params: { id: s
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">{character.name}</h1>
+        <Title>{character.name}</Title>
         <div className="opacity-80 text-sm">Nivel {character.level} · EXP {character.exp}/74</div>
       </div>
 
@@ -61,7 +62,7 @@ export default async function AdminCharacterDetail({ params }: { params: { id: s
         <PagoBoxes count={pagosCount} />
         <form action={increment}>
           <button
-            className="mt-2 rounded border border-slate-700 px-3 py-1 disabled:opacity-50"
+            className="mt-2 rounded border border-stone-700 px-3 py-1 disabled:opacity-50"
             disabled={pagosCount >= 5}
           >
             Marcar pago (+1)
@@ -74,7 +75,7 @@ export default async function AdminCharacterDetail({ params }: { params: { id: s
 
       <div className="space-y-1">
         <div className="font-semibold">Objetos</div>
-        <pre className="whitespace-pre-wrap rounded border border-slate-800 p-3 text-sm opacity-90">{character.items || '—'}</pre>
+        <pre className="whitespace-pre-wrap rounded border border-stone-800/70 bg-stone-900/40 p-3 text-sm opacity-90">{character.items || '—'}</pre>
       </div>
     </div>
   )
