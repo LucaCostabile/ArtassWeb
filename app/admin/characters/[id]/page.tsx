@@ -17,7 +17,7 @@ function PagoBoxes({ count }: { count: number }) {
   )
 }
 
-type CharacterRow = { id: string; name: string; exp: number; level: number; items: string; owner: string; event_points: number }
+type CharacterRow = { id: string; name: string; exp: number; level: number; items: string; partidas: string; owner: string; event_points: number }
 
 export default async function AdminCharacterDetail({ params }: { params: { id: string } }) {
   const supabase = createClient()
@@ -29,7 +29,7 @@ export default async function AdminCharacterDetail({ params }: { params: { id: s
 
   const { data: character } = await supabase
     .from('characters')
-    .select('id, name, exp, level, items, owner, event_points')
+    .select('id, name, exp, level, items, partidas, owner, event_points')
     .eq('id', params.id)
     .maybeSingle()
   if (!character) redirect('/admin/characters')
@@ -122,6 +122,11 @@ export default async function AdminCharacterDetail({ params }: { params: { id: s
       <div className="space-y-1">
         <div className="font-semibold">Objetos</div>
   <pre className="whitespace-pre-wrap rounded border border-stone-800/70 bg-stone-900/40 p-3 text-sm opacity-90">{characterRow.items || '—'}</pre>
+      </div>
+
+      <div className="space-y-1">
+        <div className="font-semibold">Partidas</div>
+        <pre className="whitespace-pre-wrap rounded border border-stone-800/70 bg-stone-900/40 p-3 text-sm opacity-90">{characterRow.partidas || '—'}</pre>
       </div>
     </div>
   )

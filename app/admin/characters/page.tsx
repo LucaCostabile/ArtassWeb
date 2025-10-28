@@ -13,7 +13,7 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
   if (!me?.is_admin) redirect('/dashboard')
 
   // Tipos
-  type CharItem = { id: string; name: string; exp: number; level: number; owner: string; items: string; event_points: number }
+  type CharItem = { id: string; name: string; exp: number; level: number; owner: string; items: string; partidas: string; event_points: number }
   type ProfileItem = { id: string; name: string | null }
 
   // Filtros desde query
@@ -30,7 +30,7 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
   // Construir query de personajes con filtros
   let query = supabase
     .from('characters')
-    .select('id, name, exp, level, owner, items, event_points')
+    .select('id, name, exp, level, owner, items, partidas, event_points')
     .order('created_at', { ascending: false })
   if (fOwner) query = query.eq('owner', fOwner)
   if (fName) query = query.ilike('name', `%${fName}%`)
@@ -63,14 +63,15 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
     const name = String(formData.get('name') || '').trim()
     const exp = Number(formData.get('exp') || 0)
     const level = Number(formData.get('level') || 1)
-    const items = String(formData.get('items') || '')
+  const items = String(formData.get('items') || '')
+  const partidas = String(formData.get('partidas') || '')
 
     if (!owner || !name) throw new Error('Owner y Nombre son obligatorios')
     if (Number.isNaN(exp) || exp < 0 || exp > 74) throw new Error('EXP debe estar entre 0 y 74')
     if (Number.isNaN(level) || level < 1) throw new Error('Nivel debe ser >= 1')
 
     const admin = createAdminClient()
-    const { error } = await admin.from('characters').insert({ owner, name, exp, level, items })
+  const { error } = await admin.from('characters').insert({ owner, name, exp, level, items, partidas })
     if (error) throw error
     revalidatePath('/admin/characters')
   }
@@ -88,7 +89,8 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
     const name = String(formData.get('name') || '').trim()
     const exp = Number(formData.get('exp') || 0)
     const level = Number(formData.get('level') || 1)
-    const items = String(formData.get('items') || '')
+  const items = String(formData.get('items') || '')
+  const partidas = String(formData.get('partidas') || '')
 
     if (!id) throw new Error('ID requerido')
     if (!owner || !name) throw new Error('Owner y Nombre son obligatorios')
@@ -96,7 +98,7 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
     if (Number.isNaN(level) || level < 1) throw new Error('Nivel debe ser >= 1')
 
     const admin = createAdminClient()
-    const { error } = await admin.from('characters').update({ owner, name, exp, level, items }).eq('id', id)
+  const { error } = await admin.from('characters').update({ owner, name, exp, level, items, partidas }).eq('id', id)
     if (error) throw error
     revalidatePath('/admin/characters')
   }
@@ -326,6 +328,10 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
             <span className="text-sm opacity-80">Ítems</span>
             <textarea name="items" placeholder="Listado de ítems" rows={3} className="bg-transparent border border-stone-700 rounded px-2 py-1" />
           </label>
+          <label className="flex flex-col gap-1 md:col-span-3">
+            <span className="text-sm opacity-80">Partidas</span>
+            <textarea name="partidas" placeholder="Anotaciones de partidas (libre)" rows={3} className="bg-transparent border border-stone-700 rounded px-2 py-1" />
+          </label>
           <div className="md:col-span-3">
             <button className="border border-stone-700 rounded px-3 py-1">Crear</button>
           </div>
@@ -363,6 +369,10 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
               <label className="flex flex-col gap-1 md:col-span-2">
                 <span className="text-xs opacity-70">Ítems</span>
                 <textarea name="items" defaultValue={c.items} rows={3} className="bg-transparent border border-stone-700 rounded px-2 py-1" />
+              </label>
+              <label className="flex flex-col gap-1 md:col-span-4">
+                <span className="text-xs opacity-70">Partidas</span>
+                <textarea name="partidas" defaultValue={c.partidas} rows={3} className="bg-transparent border border-stone-700 rounded px-2 py-1" />
               </label>
               <div className="md:col-span-6 flex items-center gap-3">
                 <button className="border border-stone-700 rounded px-3 py-1">Guardar</button>
