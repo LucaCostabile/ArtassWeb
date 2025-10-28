@@ -17,6 +17,8 @@ function PagoBoxes({ count }: { count: number }) {
   )
 }
 
+type CharacterRow = { id: string; name: string; exp: number; level: number; items: string; owner: string; event_points: number }
+
 export default async function AdminCharacterDetail({ params }: { params: { id: string } }) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -25,8 +27,13 @@ export default async function AdminCharacterDetail({ params }: { params: { id: s
   const { data: me } = await supabase.from('profiles').select('is_admin').eq('id', user.id).maybeSingle()
   if (!me?.is_admin) redirect('/dashboard')
 
-  const { data: character } = await supabase.from('characters').select('id, name, exp, level, items, owner, event_points').eq('id', params.id).maybeSingle()
+  const { data: character } = await supabase
+    .from('characters')
+    .select('id, name, exp, level, items, owner, event_points')
+    .eq('id', params.id)
+    .maybeSingle()
   if (!character) redirect('/admin/characters')
+  const characterRow = character as CharacterRow
 
   const { data: weekly } = await supabase
     .from('character_pagos_weekly')
@@ -83,8 +90,8 @@ export default async function AdminCharacterDetail({ params }: { params: { id: s
   return (
     <div className="space-y-6">
       <div>
-        <Title>{character.name}</Title>
-        <div className="opacity-80 text-sm">Nivel {character.level} · EXP {character.exp}/74</div>
+  <Title>{characterRow.name}</Title>
+  <div className="opacity-80 text-sm">Nivel {characterRow.level} · EXP {characterRow.exp}/74</div>
       </div>
 
       <div className="space-y-2">
@@ -106,7 +113,7 @@ export default async function AdminCharacterDetail({ params }: { params: { id: s
       <div className="space-y-2">
         <div className="font-semibold">Puntos de evento</div>
         <div className="flex items-center gap-3">
-          <div className="text-lg font-semibold">{(character as any).event_points ?? 0}</div>
+          <div className="text-lg font-semibold">{characterRow.event_points ?? 0}</div>
           <form action={decEP}><button className="rounded border border-stone-700 px-3 py-1">−</button></form>
           <form action={incEP}><button className="rounded border border-stone-700 px-3 py-1">+</button></form>
         </div>
@@ -114,7 +121,7 @@ export default async function AdminCharacterDetail({ params }: { params: { id: s
 
       <div className="space-y-1">
         <div className="font-semibold">Objetos</div>
-        <pre className="whitespace-pre-wrap rounded border border-stone-800/70 bg-stone-900/40 p-3 text-sm opacity-90">{character.items || '—'}</pre>
+  <pre className="whitespace-pre-wrap rounded border border-stone-800/70 bg-stone-900/40 p-3 text-sm opacity-90">{characterRow.items || '—'}</pre>
       </div>
     </div>
   )
