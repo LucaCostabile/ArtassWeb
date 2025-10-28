@@ -39,7 +39,8 @@ export async function POST(req: Request) {
     const { error } = await supa.auth.signInWithPassword({ email, password })
     if (error) return NextResponse.json({ error: error.message }, { status: 401 })
 
-    return NextResponse.redirect(new URL('/', process.env.NEXT_PUBLIC_SITE_URL))
+    // Redirigir a la misma origin del request (funciona en Vercel, Preview y Prod)
+    return NextResponse.redirect(new URL('/', req.url))
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Error desconocido'
     return NextResponse.json({ error: msg }, { status: 500 })
