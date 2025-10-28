@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
@@ -39,7 +38,7 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
   // Pagos semanales: obtener conteo por personaje usando la vista
   const ids = (chars as CharItem[] | null ?? []).map(c => c.id)
   type PagoRow = { character_id: string; pagos_weekly: number }
-  let pagosMap = new Map<string, number>()
+  const pagosMap = new Map<string, number>()
   if (ids.length > 0) {
     const { data: pagosRows } = await supabase
       .from('character_pagos_weekly')
@@ -113,7 +112,8 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
     const { error } = await supa.rpc('increment_pago', { p_character_id: id })
     if (error) {
       // Fallback si la función no existe aún en DB
-      if ((error as any).code === 'PGRST202') {
+      const errCode = (error as { code?: string } | null)?.code
+      if (errCode === 'PGRST202') {
         // Implementar lógica equivalente desde la app
         const now = new Date()
         const weekWindow = (d: Date) => {
@@ -161,7 +161,8 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
     const { error } = await supa.rpc('decrement_pago', { p_character_id: id })
     if (error) {
       // Fallback si la función no existe aún en DB
-      if ((error as any).code === 'PGRST202') {
+      const errCode = (error as { code?: string } | null)?.code
+      if (errCode === 'PGRST202') {
         const now = new Date()
         const weekWindow = (d: Date) => {
           const base = new Date(d)
