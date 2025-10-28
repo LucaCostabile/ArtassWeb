@@ -44,7 +44,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </nav>
         </header>
         <main className="container py-6">{children}</main>
-        <footer className="container py-8 text-sm opacity-70">© {new Date().getFullYear()} Artass</footer>
+        <footer className="container py-8 text-sm opacity-70">
+          © {new Date().getFullYear()} Artass · Desarrollado por {' '}
+          <a
+            href="https://wa.me/542615573478"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            Luca Costabile
+          </a>
+        </footer>
       </body>
     </html>
   )

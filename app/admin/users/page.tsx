@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import ConfirmButton from '@/components/ConfirmButton'
 import Title from '@/components/Title'
 
 export default async function AdminUsers({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
@@ -122,6 +123,30 @@ export default async function AdminUsers({ searchParams }: { searchParams?: { [k
     revalidatePath('/admin/users')
   }
 
+  async function deleteUser(formData: FormData) {
+    'use server'
+    const supa = createClient()
+    const { data: { user: u } } = await supa.auth.getUser()
+    if (!u) redirect('/login')
+    const { data: me2 } = await supa.from('profiles').select('is_admin').eq('id', u.id).maybeSingle()
+    if (!me2?.is_admin) redirect('/dashboard')
+
+    const id = String(formData.get('id') || '')
+    if (!id) throw new Error('ID requerido')
+    if (id === u.id) {
+      // Evitar auto-borrado accidental desde el panel
+      throw new Error('No podés eliminar tu propio usuario desde aquí.')
+    }
+
+    const admin2 = createAdminClient()
+    // Esta llamada elimina auth.users y gracias a ON DELETE CASCADE
+    // se eliminan profiles, characters y pagos_log relacionados
+    const del = await admin2.auth.admin.deleteUser(id)
+    if (del.error) throw del.error
+
+    revalidatePath('/admin/users')
+  }
+
   // Los banners ahora dependen de query solo si llegan (pero preferimos inline con server action más adelante)
   const status = typeof searchParams?.status === 'string' ? searchParams!.status : undefined
   const errorMsg = typeof searchParams?.error === 'string' ? searchParams!.error : undefined
@@ -217,7 +242,20 @@ export default async function AdminUsers({ searchParams }: { searchParams?: { [k
                     <span className="text-xs opacity-70">Nueva contraseña</span>
                     <input name="new_password" type="password" placeholder="(opcional)" className="bg-transparent border border-stone-700 rounded px-2 py-1" />
                   </label>
-                  <div className="flex items-end"><button className="border border-stone-700 rounded px-3 py-1">Guardar</button></div>
+                  <div className="flex items-end gap-2">
+                    <button className="border border-stone-700 rounded px-3 py-1">Guardar</button>
+                  </div>
+                </form>
+                <form action={deleteUser} className="py-1">
+                  <input type="hidden" name="id" value={u.id} />
+                  <ConfirmButton
+                    type="submit"
+                    className="border border-red-700 text-red-300 rounded px-3 py-1"
+                    title="Eliminar usuario"
+                    message={`¿Eliminar definitivamente al usuario "${u.name ?? emailById.get(u.id) ?? u.id}" y todos sus personajes?`}
+                  >
+                    Eliminar
+                  </ConfirmButton>
                 </form>
                 <div className="text-xs opacity-60">Creado: {new Date(u.created_at).toLocaleString('es-AR')}</div>
               </td>

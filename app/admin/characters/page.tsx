@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import ConfirmButton from '@/components/ConfirmButton'
 import Title from '@/components/Title'
 
 export default async function AdminCharacters({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
@@ -201,6 +202,23 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
     revalidatePath('/admin/characters')
   }
 
+  async function deleteCharacter(formData: FormData) {
+    'use server'
+    const supa = createClient()
+    const { data: { user: u } } = await supa.auth.getUser()
+    if (!u) redirect('/login')
+    const { data: me2 } = await supa.from('profiles').select('is_admin').eq('id', u.id).maybeSingle()
+    if (!me2?.is_admin) redirect('/dashboard')
+
+    const id = String(formData.get('id') || '').trim()
+    if (!id) throw new Error('ID requerido')
+
+    const admin = createAdminClient()
+    const { error } = await admin.from('characters').delete().eq('id', id)
+    if (error) throw error
+    revalidatePath('/admin/characters')
+  }
+
   return (
     <div className="space-y-4">
       <Title>Personajes</Title>
@@ -313,6 +331,17 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
               <form action={incrementPayment}>
                 <input type="hidden" name="id" value={c.id} />
                 <button type="submit" className="border border-stone-700 rounded px-2 py-1 text-sm" title="Agregar pago">+</button>
+              </form>
+              <form action={deleteCharacter}>
+                <input type="hidden" name="id" value={c.id} />
+                <ConfirmButton
+                  type="submit"
+                  className="border border-red-700 text-red-300 rounded px-2 py-1 text-sm"
+                  title="Eliminar personaje"
+                  message={`¿Eliminar definitivamente el personaje "${c.name}"?`}
+                >
+                  Eliminar
+                </ConfirmButton>
               </form>
             </div>
           </li>
