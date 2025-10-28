@@ -13,7 +13,7 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
   if (!me?.is_admin) redirect('/dashboard')
 
   // Tipos
-  type CharItem = { id: string; name: string; exp: number; level: number; owner: string; items: string }
+  type CharItem = { id: string; name: string; exp: number; level: number; owner: string; items: string; event_points: number }
   type ProfileItem = { id: string; name: string | null }
 
   // Filtros desde query
@@ -30,7 +30,7 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
   // Construir query de personajes con filtros
   let query = supabase
     .from('characters')
-    .select('id, name, exp, level, owner, items')
+    .select('id, name, exp, level, owner, items, event_points')
     .order('created_at', { ascending: false })
   if (fOwner) query = query.eq('owner', fOwner)
   if (fName) query = query.ilike('name', `%${fName}%`)
@@ -202,6 +202,57 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
     revalidatePath('/admin/characters')
   }
 
+  async function incrementEventPoints(formData: FormData) {
+    'use server'
+    const supa = createClient()
+    const { data: { user: u } } = await supa.auth.getUser()
+    if (!u) redirect('/login')
+    const { data: me2 } = await supa.from('profiles').select('is_admin').eq('id', u.id).maybeSingle()
+    if (!me2?.is_admin) redirect('/dashboard')
+    const id = String(formData.get('id') || '').trim()
+    if (!id) throw new Error('ID requerido')
+    const { data: row, error: selErr } = await supa
+      .from('characters')
+      .select('event_points')
+      .eq('id', id)
+      .maybeSingle()
+    if (selErr) throw selErr
+    const current = Number(row?.event_points ?? 0)
+    const next = current + 1
+    const { error: updErr } = await supa
+      .from('characters')
+      .update({ event_points: next })
+      .eq('id', id)
+    if (updErr) throw updErr
+    revalidatePath('/admin/characters')
+  }
+
+  async function decrementEventPoints(formData: FormData) {
+    'use server'
+    const supa = createClient()
+    const { data: { user: u } } = await supa.auth.getUser()
+    if (!u) redirect('/login')
+    const { data: me2 } = await supa.from('profiles').select('is_admin').eq('id', u.id).maybeSingle()
+    if (!me2?.is_admin) redirect('/dashboard')
+    const id = String(formData.get('id') || '').trim()
+    if (!id) throw new Error('ID requerido')
+    const { data: row, error: selErr } = await supa
+      .from('characters')
+      .select('event_points')
+      .eq('id', id)
+      .maybeSingle()
+    if (selErr) throw selErr
+    const current = Number(row?.event_points ?? 0)
+    const next = Math.max(0, current - 1)
+    const { error: updErr } = await supa
+      .from('characters')
+      .update({ event_points: next })
+      .eq('id', id)
+    if (updErr) throw updErr
+    revalidatePath('/admin/characters')
+  }
+
+
   async function deleteCharacter(formData: FormData) {
     'use server'
     const supa = createClient()
@@ -317,7 +368,7 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
                 <button className="border border-stone-700 rounded px-3 py-1">Guardar</button>
               </div>
             </form>
-            <div className="flex items-center gap-2 mt-3 justify-end">
+            <div className="flex items-center gap-2 mt-3 justify-end flex-wrap">
               <span className="text-xs opacity-70">Pagos semana:</span>
               <div className="flex gap-1">
                 {boxes.map((filled, i) => (
@@ -331,6 +382,17 @@ export default async function AdminCharacters({ searchParams }: { searchParams?:
               <form action={incrementPayment}>
                 <input type="hidden" name="id" value={c.id} />
                 <button type="submit" className="border border-stone-700 rounded px-2 py-1 text-sm" title="Agregar pago">+</button>
+              </form>
+              <div className="mx-3 h-5 w-px bg-stone-700/60" />
+              <span className="text-xs opacity-70">Puntos de evento:</span>
+              <div className="text-sm font-semibold">{c.event_points}</div>
+              <form action={decrementEventPoints}>
+                <input type="hidden" name="id" value={c.id} />
+                <button type="submit" className="border border-stone-700 rounded px-2 py-1 text-sm" title="Restar punto">−</button>
+              </form>
+              <form action={incrementEventPoints}>
+                <input type="hidden" name="id" value={c.id} />
+                <button type="submit" className="border border-stone-700 rounded px-2 py-1 text-sm" title="Sumar punto">+</button>
               </form>
               <form action={deleteCharacter}>
                 <input type="hidden" name="id" value={c.id} />

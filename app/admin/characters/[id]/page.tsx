@@ -25,7 +25,7 @@ export default async function AdminCharacterDetail({ params }: { params: { id: s
   const { data: me } = await supabase.from('profiles').select('is_admin').eq('id', user.id).maybeSingle()
   if (!me?.is_admin) redirect('/dashboard')
 
-  const { data: character } = await supabase.from('characters').select('id, name, exp, level, items, owner').eq('id', params.id).maybeSingle()
+  const { data: character } = await supabase.from('characters').select('id, name, exp, level, items, owner, event_points').eq('id', params.id).maybeSingle()
   if (!character) redirect('/admin/characters')
 
   const { data: weekly } = await supabase
@@ -50,6 +50,36 @@ export default async function AdminCharacterDetail({ params }: { params: { id: s
     revalidatePath(`/admin/characters/${params.id}`)
   }
 
+  async function incEP() {
+    'use server'
+    const supa = createClient()
+    const { data: { user: u } } = await supa.auth.getUser()
+    if (!u) redirect('/login')
+    const { data: me2 } = await supa.from('profiles').select('is_admin').eq('id', u.id).maybeSingle()
+    if (!me2?.is_admin) redirect('/dashboard')
+    const { data: row, error: selErr } = await supa.from('characters').select('event_points').eq('id', params.id).maybeSingle()
+    if (selErr) throw selErr
+    const next = Number(row?.event_points ?? 0) + 1
+    const { error: updErr } = await supa.from('characters').update({ event_points: next }).eq('id', params.id)
+    if (updErr) throw updErr
+    revalidatePath(`/admin/characters/${params.id}`)
+  }
+
+  async function decEP() {
+    'use server'
+    const supa = createClient()
+    const { data: { user: u } } = await supa.auth.getUser()
+    if (!u) redirect('/login')
+    const { data: me2 } = await supa.from('profiles').select('is_admin').eq('id', u.id).maybeSingle()
+    if (!me2?.is_admin) redirect('/dashboard')
+    const { data: row, error: selErr } = await supa.from('characters').select('event_points').eq('id', params.id).maybeSingle()
+    if (selErr) throw selErr
+    const next = Math.max(0, Number(row?.event_points ?? 0) - 1)
+    const { error: updErr } = await supa.from('characters').update({ event_points: next }).eq('id', params.id)
+    if (updErr) throw updErr
+    revalidatePath(`/admin/characters/${params.id}`)
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -71,6 +101,15 @@ export default async function AdminCharacterDetail({ params }: { params: { id: s
         {pagosCount >= 5 && (
           <div className="text-sm opacity-70">Límite semanal alcanzado (5). Reinicia el sábado 00:00.</div>
         )}
+      </div>
+
+      <div className="space-y-2">
+        <div className="font-semibold">Puntos de evento</div>
+        <div className="flex items-center gap-3">
+          <div className="text-lg font-semibold">{(character as any).event_points ?? 0}</div>
+          <form action={decEP}><button className="rounded border border-stone-700 px-3 py-1">−</button></form>
+          <form action={incEP}><button className="rounded border border-stone-700 px-3 py-1">+</button></form>
+        </div>
       </div>
 
       <div className="space-y-1">

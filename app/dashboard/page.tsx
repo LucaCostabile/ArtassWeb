@@ -11,10 +11,10 @@ export default async function DashboardPage() {
 
   if (!user) redirect('/login')
 
-  type MyChar = { id: string; name: string; exp: number; level: number; items: string }
+  type MyChar = { id: string; name: string; exp: number; level: number; items: string; event_points: number }
   const { data: characters } = await supabase
     .from('characters')
-    .select('id, name, exp, level, items')
+    .select('id, name, exp, level, items, event_points')
     .eq('owner', user.id)
     .order('name')
 
@@ -52,6 +52,10 @@ export default async function DashboardPage() {
                       <div key={i} className={`w-4 h-4 rounded border ${filled ? 'bg-green-600 border-green-600' : 'border-stone-600'}`} />
                     ))}
                   </div>
+                </div>
+                <div className="sheet-section p-3 flex items-center gap-3">
+                  <span className="text-xs opacity-70">Puntos de evento:</span>
+                  <div className="text-sm font-semibold">{c.event_points}</div>
                 </div>
                 <div className="sheet-section p-3">
                   <div className="text-sm opacity-80 mb-1">Objetos</div>

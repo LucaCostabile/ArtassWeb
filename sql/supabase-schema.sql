@@ -44,8 +44,13 @@ create table if not exists public.characters (
   exp int not null default 0 check (exp between 0 and 74),
   level int not null default 1,
   items text not null default '',
+  event_points int not null default 0,
   created_at timestamptz not null default now()
 );
+
+-- Asegurar columna en instalaciones existentes
+alter table if exists public.characters
+  add column if not exists event_points int not null default 0;
 
 -- Limitar cantidad de personajes por usuario
 create or replace function public.enforce_character_limit() returns trigger
