@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     const { error } = await supa.auth.signInWithPassword({ email, password })
     if (error) return NextResponse.json({ error: error.message }, { status: 401 })
 
-    return NextResponse.redirect(new URL('/', process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'))
+    return NextResponse.redirect(new URL('/', process.env.NEXT_PUBLIC_SITE_URL))
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Error desconocido'
     return NextResponse.json({ error: msg }, { status: 500 })
